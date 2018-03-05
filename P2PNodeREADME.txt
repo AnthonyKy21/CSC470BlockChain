@@ -1,6 +1,6 @@
+AUTHOR -- JOSEPH JASPERS
 
 Utilizes multi-threading for reading writing.
-
 //Initialize 
 
 P2PNode<DataType> self = new P2PNode<DataType>(int port_number_to_interact_on);
