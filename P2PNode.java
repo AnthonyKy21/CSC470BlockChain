@@ -25,7 +25,7 @@ public class P2PNode<T> extends Thread {
     P2PNode(int port_) {
         port = port_;
     }
-    void addConecction(String address) {
+    void addConnection(String address) {
         serverAddresses.add(address);
     }
 
@@ -35,7 +35,7 @@ public class P2PNode<T> extends Thread {
             
             String serverAddress = serverAddresses.get(i);
         
-        Socket s = new Socket(serverAddress, 9090);
+        Socket s = new Socket(serverAddress, port);
         try {
 
             //BufferedReader input = new BufferedReader();
