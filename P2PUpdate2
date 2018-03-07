@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-/**
- * Trivial client for the date server.
- */
+
+Act as a Node in a P2P Server 
+
 public class P2PNode<T> extends Thread {
 
     int port;                                   //
@@ -32,11 +32,7 @@ public class P2PNode<T> extends Thread {
 
     public void send(T data) throws IOException, ClassNotFoundException {
         for (int i = 0; i < serverAddresses.size(); ++i) {
-            String serverAddress = serverAddresses.get(i);            
-            Socket s = new Socket(serverAddress, port);
-            //BufferedReader input = new BufferedReader();
-            ObjectOutputStream obj_writer = new ObjectOutputStream(s.getOutputStream());
-            obj_writer.writeObject(data);
+            send(i, data); 
         }
     }
         public void send(int i,T data) throws IOException, ClassNotFoundException {
@@ -48,8 +44,6 @@ public class P2PNode<T> extends Thread {
         
     }
     
-    
-    ///this is the listener method ------------ call run ----------------------------------
     @Override
     public void run() {
         
