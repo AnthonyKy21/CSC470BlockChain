@@ -5,11 +5,16 @@
  */
 package bcp2p;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -34,6 +39,28 @@ public class P2PNode<T> extends Thread {
 
     void addConnection(String address) {
         serverAddresses.add(address);
+    }
+    
+    // Instantiates your connection to the group chat
+    void addSelf() throws UnknownHostException, IOException
+    {
+        
+        String hostName;
+        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+        System.out.print("Enter host name: ");
+        hostName = input.readLine();
+        
+        try
+        {
+            InetAddress.getByName(hostName);
+            addConnection(InetAddress.getLocalHost().getHostAddress());
+            System.out.println("Connection successful.");
+        }
+        catch (UnknownHostException e)
+        {
+            System.out.println("Could not find " + hostName + "\nProcess aborted.") ;
+        }
+
     }
 
     void shareServerList(P2PNode<?> node) {
@@ -94,8 +121,8 @@ public class P2PNode<T> extends Thread {
             Socket s = new Socket(serverAddress, port);
             ObjectOutputStream obj_writer = new ObjectOutputStream(s.getOutputStream());
             obj_writer.writeObject(data);
-        } catch (Exception e) {
-            System.out.println(e);
+        } catch (IOException e) {
+            System.out.println("Client Error: " + e.getMessage());
             return false;
         }
         return true;
@@ -105,59 +132,35 @@ public class P2PNode<T> extends Thread {
     @Override
     public void run() {
 
-        ServerSocket listener = null;
         Socket socket = null;
+        try(ServerSocket listener = new ServerSocket(port)){
+            
+            while (true) {
+                try {
 
-        try {
-            listener = new ServerSocket(port);
+                    //accept a connection 
+                    socket = listener.accept();
+                    ObjectInputStream obj_reader = new ObjectInputStream(socket.getInputStream()); //attempt to read / get data from it 
+
+                    locker.lock();
+                    data_received.add((T) obj_reader.readObject());
+                    locker.unlock();
+
+                    System.out.println(data_received.get(data_received.size() - 1));
+                    
+                } catch (IOException | ClassNotFoundException e) {
+                    System.out.println("Oops: " + e.getMessage());
+                } 
+                finally {
+                    try {
+                        socket.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(P2PNode.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
         } catch (IOException ex) {
             Logger.getLogger(P2PNode.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        while (true) {
-            try {
-
-                //accept a connection 
-                socket = listener.accept();
-                ObjectInputStream obj_reader = new ObjectInputStream(socket.getInputStream()); //attempt to read / get data from it 
-
-                locker.lock();
-                data_received.add((T) obj_reader.readObject());
-                locker.unlock();
-
-                System.out.println(data_received.get(data_received.size() - 1));
-            } catch (Exception e) {
-            } finally {
-                try {
-                    socket.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(P2PNode.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
     }
 }
-
-//
-//    public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
-//        P2PNode<String> self = new P2PNode<>(9091);
-//        String joe = "104.201.202.232";
-//        String won = "104.201.247.121";
-//        String ky = "104.201.210.88";
-//        self.addConnection(won);
-//        self.addConnection(ky);
-//        self.addConnection(joe);
-//
-//        self.start();
-//
-//        Scanner scan = new Scanner(System.in);
-//        while (true) {
-//            System.out.print(">>>Joseph: ");
-//
-//            String statement = "Joseph: " + scan.nextLine();
-//            System.out.print(">>>Joseph: ");
-//            self.send(1, statement);
-//            self.send(0, statement);
-//        }
-//
-//    }
