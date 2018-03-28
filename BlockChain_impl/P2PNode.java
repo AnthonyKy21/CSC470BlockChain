@@ -3,21 +3,30 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package bcp2p;
+
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sun.awt.Mutex;
@@ -30,6 +39,7 @@ public class P2PNode<T> extends Thread {
     int port;
     ArrayList<String> serverAddresses = new ArrayList<>();
     LinkedList<T> data_received = new LinkedList<>();
+    private static final String POISON_PILL = "POISON_PILL";
 
     Mutex locker = new Mutex();
 
@@ -113,54 +123,107 @@ public class P2PNode<T> extends Thread {
         return true;
 
     }
+    
+    public byte[] serialize(T data) throws IOException
+    {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ObjectOutputStream os = new ObjectOutputStream(out);
+        os.writeObject(data); 
+        
+        return out.toByteArray();
+    }
 
     ///send to specific connection
     public boolean send(int i, T data) {
+        
         try {
             String serverAddress = serverAddresses.get(i);
-            Socket s = new Socket(serverAddress, port);
-            ObjectOutputStream obj_writer = new ObjectOutputStream(s.getOutputStream());
-            obj_writer.writeObject(data);
+            SocketChannel sender = SocketChannel.open(new InetSocketAddress(serverAddress, port));
+            ByteBuffer buffer = ByteBuffer.allocate(256);
+            buffer = ByteBuffer.wrap(serialize(data));
+            String msg = null;
+            
+            sender.write(buffer);
+            buffer.clear();
         } catch (IOException e) {
             System.out.println("Client Error: " + e.getMessage());
             return false;
         }
-        return true;
+        return true;  
     }
 
     ///this is the listener method ------------ call run ----------------------------------
     @Override
     public void run() {
-
-        Socket socket = null;
-        try(ServerSocket listener = new ServerSocket(port)){
+        
+        try {
+            Selector selector = Selector.open();
+            ServerSocketChannel serverSocket = ServerSocketChannel.open();
+            serverSocket.bind(new InetSocketAddress(port));
+            serverSocket.configureBlocking(false);
+            serverSocket.register(selector, SelectionKey.OP_ACCEPT);
+            ByteBuffer buffer = ByteBuffer.allocate(256);
             
-            while (true) {
-                try {
-
-                    //accept a connection 
-                    socket = listener.accept();
-                    ObjectInputStream obj_reader = new ObjectInputStream(socket.getInputStream()); //attempt to read / get data from it 
-
-                    locker.lock();
-                    data_received.add((T) obj_reader.readObject());
-                    locker.unlock();
-
-                    System.out.println(data_received.get(data_received.size() - 1));
+            while(true){
+                selector.select();
+                Set<SelectionKey> selectedKeys = selector.selectedKeys();
+                Iterator<SelectionKey> iter = selectedKeys.iterator();
+                
+                while(iter.hasNext()){
+                    SelectionKey key = iter.next();
                     
-                } catch (IOException | ClassNotFoundException e) {
-                    System.out.println("Oops: " + e.getMessage());
-                } 
-                finally {
-                    try {
-                        socket.close();
-                    } catch (IOException ex) {
-                        Logger.getLogger(P2PNode.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                    if(key.isAcceptable())
+                        register(selector, serverSocket);
+                    if(key.isReadable())
+                        readMsg(buffer, key);
+                    
+                    iter.remove();
                 }
             }
         } catch (IOException ex) {
             Logger.getLogger(P2PNode.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    public void register(Selector selector, ServerSocketChannel serverSocket) throws IOException {
+
+        SocketChannel client = serverSocket.accept();
+        client.configureBlocking(false);
+        client.register(selector, SelectionKey.OP_READ);
+    }
+    
+    public  void readMsg(ByteBuffer buffer, SelectionKey key) throws IOException {
+        String msg = null;
+        SocketChannel client = (SocketChannel) key.channel();
+        client.read(buffer);
+        System.out.println(new String(buffer.array()).trim());
+        buffer.clear();
+        if (new String(buffer.array()).trim().equals(POISON_PILL)) {
+            client.close();
+            System.out.println("Not accepting client messages anymore");
+        }
+    }
+    
+    public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
+        P2PNode<String> self = new P2PNode<>(9091);
+        String won = "";
+        String vm = "";
+      
+        self.addConnection(won);
+        self.addConnection(vm);
+        
+        
+        self.start();
+        Scanner scan = new Scanner(System.in);
+        while(true) {
+            
+        String statement = scan.nextLine();    
+        self.send(1, statement);  
+
+            
+            
+        }
+    }
+
+       
 }
