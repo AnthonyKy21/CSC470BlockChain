@@ -1,2 +1,2 @@
-# CSC490BlockChain
-CSC490 - Independent Study Project - Implementing a block chain 
+# CSC470BlockChain
+CSC470 - Independent Study Project - Implementing a block chain 
