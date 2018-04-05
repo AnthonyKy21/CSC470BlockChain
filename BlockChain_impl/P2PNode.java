@@ -6,6 +6,7 @@
 
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -132,6 +133,13 @@ public class P2PNode<T> extends Thread {
         
         return out.toByteArray();
     }
+    
+    public T deserialize(byte[] buffer) throws IOException, ClassNotFoundException
+    {
+        ByteArrayInputStream in = new ByteArrayInputStream(buffer);
+        ObjectInputStream is = new ObjectInputStream(in);
+        return (T) is.readObject();
+    }
 
     ///send to specific connection
     public boolean send(int i, T data) {
@@ -193,12 +201,20 @@ public class P2PNode<T> extends Thread {
     }
     
     public  void readMsg(ByteBuffer buffer, SelectionKey key) throws IOException {
-        String msg = null;
         SocketChannel client = (SocketChannel) key.channel();
         client.read(buffer);
-        System.out.println(new String(buffer.array()).trim());
+        
+        try {
+            locker.lock();
+            data_received.add(deserialize(buffer.array()));
+            locker.unlock();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(P2PNode.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.out.println("Message: " + data_received.get(data_received.size() - 1));
+
         buffer.clear();
-        if (new String(buffer.array()).trim().equals(POISON_PILL)) {
+        if (new String(buffer.array()).trim().contains(POISON_PILL)) {
             client.close();
             System.out.println("Not accepting client messages anymore");
         }
@@ -206,7 +222,7 @@ public class P2PNode<T> extends Thread {
     
     public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
         P2PNode<String> self = new P2PNode<>(9091);
-        String won = "";
+        String won = "192.168.1.3";
         String vm = "";
       
         self.addConnection(won);
@@ -218,7 +234,7 @@ public class P2PNode<T> extends Thread {
         while(true) {
             
         String statement = scan.nextLine();    
-        self.send(1, statement);  
+        self.send(0, statement);  
 
             
             
