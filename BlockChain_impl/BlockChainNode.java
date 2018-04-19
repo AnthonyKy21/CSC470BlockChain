@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package bcp2p;
+package blockchain;
 
+import blockchain.P2PNode;
 import java.util.LinkedList;
 
 /**
@@ -25,7 +26,7 @@ public class BlockChainNode<T> extends Thread {
     }
     
     BlockChain<T> chain = new BlockChain<T>();
-    P2PNode<data> node  = new P2PNode<data>();
+    P2PNode<data> node  = new P2PNode<data>(9091);
    
     
     P2PNode<data> selfServer() {
@@ -33,11 +34,14 @@ public class BlockChainNode<T> extends Thread {
     }
     
     @Override public void run() {
+        node.run();
         while (true) {
             LinkedList<data> datalist = node.getDataClear();
             if (!datalist.isEmpty()) {
-                for (data RCVD_DATA : datalist)
+                for (data RCVD_DATA : datalist) {
+                    System.out.println(RCVD_DATA.data);
                     chain.add(RCVD_DATA.data);
+                }
                 
                 if (!chain.compareValid(datalist.getLast().chain)) {
                     System.out.println("discrpency detected");
