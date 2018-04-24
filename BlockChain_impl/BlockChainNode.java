@@ -7,50 +7,45 @@ package blockchain;
 
 import blockchain.P2PNode;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author joseph
  */
-public class BlockChainNode<T> extends Thread {
+public class BlockChainNode<T extends Object> extends Thread {
     
-    private class data {
-        
-        data(BlockChain<T> ch, T dat) {
-            chain = ch;
-            data = dat; 
-        }
-        
-        BlockChain<T> chain;
-        T data; 
-    }
     
-    BlockChain<T> chain = new BlockChain<T>();
-    P2PNode<data> node  = new P2PNode<data>(9091);
+    BlockChain<T> chain = new BlockChain<T>();                      //Data list sender
+    P2PNode<Integer[]> p2p_chain  = new P2PNode<Integer[]>(9091);        //Hash list sender 
+    P2PNode<T> node  = new P2PNode<T>(9091);        //Hash list sender 
    
-    
-    P2PNode<data> selfServer() {
-        return node;
-    }
-    
+
     @Override public void run() {
-        node.run();
+        node.start();
         while (true) {
-            LinkedList<data> datalist = node.getDataClear();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(BlockChainNode.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            LinkedList<T> datalist = node.getDataClear();
+            System.out.println("accepted data");
             if (!datalist.isEmpty()) {
-                for (data RCVD_DATA : datalist) {
-                    System.out.println(RCVD_DATA.data);
-                    chain.add(RCVD_DATA.data);
-                }
-                
-                if (!chain.compareValid(datalist.getLast().chain)) {
-                    System.out.println("discrpency detected");
+                 System.out.println("is not empty");
+
+                for (T RCVD_DATA : datalist) {
+                    System.out.println(RCVD_DATA);
+                    chain.add(RCVD_DATA);
                 }
             }
+         System.out.println("data is empty");
+
         }
     }
     
     void send(T data) {
-        node.send(new data(chain, data));
+        node.send(data);
     }
 } 
