@@ -68,8 +68,6 @@ public class Frame extends javax.swing.JFrame {
 
         usernameLabel.setText("Username:");
 
-        usernameField.setText("jTextField1");
-
         sendButton.setText("Send");
 
         inputArea.setColumns(20);
@@ -81,13 +79,9 @@ public class Frame extends javax.swing.JFrame {
         outputArea.setRows(5);
         jScrollPane2.setViewportView(outputArea);
 
-        hostField.setText("jTextField1");
-
         hostLabel.setText("Host");
 
         jLabel1.setText("Port");
-
-        portField.setText("jTextField1");
 
         connectButton.setText("Connect");
 
@@ -109,12 +103,12 @@ public class Frame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(hostLabel)
-                    .addComponent(hostField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1)
-                    .addComponent(portField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(sendButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(connectButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(disconnectButton, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE))
+                    .addComponent(disconnectButton, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE)
+                    .addComponent(hostField)
+                    .addComponent(portField))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
