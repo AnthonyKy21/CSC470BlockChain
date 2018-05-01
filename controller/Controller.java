@@ -12,17 +12,17 @@ import views.Frame;
  * @author Ky
  */
 public class Controller {
-    
+
     private final Frame frame = new Frame();
-    
+
     public Controller() {
-    frame.setTitle(getClass().getSimpleName());
-    frame.setLocationRelativeTo(null);
-}
-    
+        frame.setTitle(getClass().getSimpleName());
+        frame.setLocationRelativeTo(null);
+    }
+
     public static void main(String[] args) {
         Controller app = new Controller();
         app.frame.setVisible(true);
     }
-    
+
 }
