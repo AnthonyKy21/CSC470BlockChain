@@ -50,6 +50,8 @@ public class Controller {
                 String input = inputArea.getText();
                 Message msg = new Message(input);
                 node.send(msg);
+                outputArea.setText(username.getText() + ": " + msg);
+                inputArea.setText("");
             }
         });
 
