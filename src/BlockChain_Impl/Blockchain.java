@@ -34,6 +34,7 @@ public class Blockchain {
         {
             System.out.println("Enter information:"); //i.e. First Name, Last Name, and Age
             
+            
            /* firstName = kb.nextLine();
             lastName = kb.nextLine();
             age = kb.nextInt();

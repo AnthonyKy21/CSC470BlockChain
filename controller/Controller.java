@@ -31,14 +31,17 @@ public class Controller {
 
         frame.setTitle(getClass().getSimpleName());
         frame.setLocationRelativeTo(null);
-        frame.getHostField().setText("192.168.1.4");
+
+        host.setText("192.168.1.4");
+        port.setText("9091");
+        port.setEditable(false);
 
         connectButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 username.setEditable(false);
                 host.setEditable(false);
-                port.setEditable(false);
+//                port.setEditable(false);
                 node.addConnection(host.getText().trim());
                 node.start();
             }
@@ -50,7 +53,7 @@ public class Controller {
                 String input = inputArea.getText();
                 Message msg = new Message(input);
                 node.send(msg);
-                outputArea.setText(username.getText() + ": " + msg);
+                outputArea.setText(username.getText().trim() + ": " + msg + "\n");
                 inputArea.setText("");
             }
         });
@@ -60,7 +63,7 @@ public class Controller {
             public void actionPerformed(ActionEvent e) {
                 username.setEditable(true);
                 host.setEditable(true);
-                port.setEditable(true);
+//                port.setEditable(true);
             }
         });
     }
