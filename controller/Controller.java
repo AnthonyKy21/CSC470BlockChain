@@ -44,6 +44,13 @@ public class Controller {
 //                port.setEditable(false);
                 node.addConnection(host.getText().trim());
                 node.start();
+
+                String input = "Hello World.";
+                Message msg = new Message(input);
+                while (true) {
+                    input = inputArea.getText().trim();
+                    node.send(msg);
+                }
             }
         });
 
