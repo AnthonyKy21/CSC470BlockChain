@@ -7,7 +7,6 @@ package P2P_Hybrid;
 
 import java.io.Serializable;
 import java.util.LinkedList;
-
 /**
  *
  * @author joseph
@@ -16,7 +15,6 @@ import java.util.LinkedList;
 public class Forward_Setter<T extends Serializable>  implements Forwarder<LinkedList<BlockChain<T>.data>>, Serializable{
     
     BlockChain bc_ptr;
-//    Mutex m = new Mutex();
     
     Forward_Setter(BlockChain<T> bc_ptr) {
         this.bc_ptr = bc_ptr; 

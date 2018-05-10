@@ -11,11 +11,15 @@ import java.io.Serializable;
  *
  * @author joseph
  * @param <T>
+ * 
+ * 
+ * Accepts the generic data type of the P2P Node and forwards it to the BlockChain
+ * 
+ * 
  */
 public class Forward_Adder<T extends Serializable> implements Forwarder<T>, Serializable {
     
     BlockChain<T> bc_ptr;
-//    Mutex m = new Mutex();
     
     Forward_Adder(BlockChain<T> bc_ptr) {
         this.bc_ptr = bc_ptr; 

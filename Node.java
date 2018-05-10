@@ -54,18 +54,12 @@ public class Node<T extends Serializable> extends Thread implements Serializable
     public void send(int i, T data) 
     {
         
-        // TODO code application logic here
         String serverAddress = serverAddresses.get(i);
         try(Socket socket = new Socket(serverAddress, portNumber))
         {
             //socket.setSoTimeout(5000);
             ObjectOutputStream obj_writer = new ObjectOutputStream(socket.getOutputStream());
-            
-            Scanner scanner = new Scanner(System.in);
-            String echoString;
-            String response;
-            obj_writer.writeObject(data);
-            
+            obj_writer.writeObject(data);          
         }
         catch(SocketTimeoutException e)
         {
