@@ -16,28 +16,32 @@ import com.sun.corba.se.impl.orbutil.concurrent.Mutex;
 
 /**
  *
- * @author Won
+ * @author Won Murdoc & Joseph Jaspers
  * @param <T>
+ 
+ * P2P Node that is used in conjunction with other nodes to create a network. 
+ * TCP based. 
  */
 public class Node<T extends Serializable> extends Thread implements Serializable
 {
-    List<String> serverAddresses = new ArrayList<>();
-    int portNumber;    
-    Forwarder<T> sender; 
-    Mutex locker = new Mutex();
+    List<String> serverAddresses = new ArrayList<>();           //List of IPs on the network
+    int portNumber;                                             //Port number to send/listen to 
+    Forwarder<T> sender;                                        //Functor object to send data after a successful listen
+    Mutex locker = new Mutex();                                 //Locks the Forward<T> sender to ensure thread safety.
  
-    
     public Node(int portNumber, Forwarder sender)
     {
         this.portNumber = portNumber;
         this.sender = sender;
     }
     
+    // add a connection to the ip list
     public void addConnection(String address)
     {
         serverAddresses.add(address);
     }
     
+    //send to all nodes on the network
     public void send(T data)
     {
         try 
@@ -51,6 +55,7 @@ public class Node<T extends Serializable> extends Thread implements Serializable
         }
     }
     
+    //send to a specific user on the network 
     public void send(int i, T data) 
     {
         
@@ -71,6 +76,7 @@ public class Node<T extends Serializable> extends Thread implements Serializable
         }
     }
     
+    //The actual thread that listens for data transmission on the network. 
     public void run() 
     {
         // TODO code application logic here
@@ -84,6 +90,7 @@ public class Node<T extends Serializable> extends Thread implements Serializable
             ObjectInputStream obj_reader = new ObjectInputStream(socket.getInputStream());
             T data =  (T) obj_reader.readObject();
                     try {
+                        //Ensure thread safety 
                         locker.acquire();
                         sender.forward(data);
                         locker.release();
@@ -125,23 +132,5 @@ public class Node<T extends Serializable> extends Thread implements Serializable
         {
             System.out.println("Server exception " + e.getMessage());
         }
-    }
-    
-       public static void main(String[] args) throws InterruptedException
-    {
-        BlockChain<String> node = new BlockChain<>();
-        node.addConnection("104.201.246.65");
-        node.init();
-        
-        Scanner kb = new Scanner(System.in);
-        String input;
-        while(true)
-        {       
-            input = kb.nextLine();
-            node.add(input);
-            
-            
-            System.out.println(node);
-        }          
     }
 }
