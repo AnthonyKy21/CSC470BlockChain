@@ -11,6 +11,12 @@ import java.util.LinkedList;
  *
  * @author joseph
  * @param <T>
+ * 
+ * -- A lamda class
+ * 
+ * Listens for client-side blockchain objects (represented by LinkedList<Blockchain<T>.data>> and handles 
+ * checking that the blockchain is valid, and handling collisions if there is a discrepency. 
+ * **Current naively just swaps the entire blockchain. Eventually will be changed to a more sophisticated method.
  */
 public class Forward_Setter<T extends Serializable>  implements Forwarder<LinkedList<BlockChain<T>.data>>, Serializable{
     
