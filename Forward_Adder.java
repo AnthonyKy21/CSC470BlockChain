@@ -12,10 +12,12 @@ import java.io.Serializable;
  * @author joseph
  * @param <T>
  * 
+ * -- A lamda class
  * 
  * Accepts the generic data type of the P2P Node and forwards it to the BlockChain
- * 
- * 
+ * Used for the generic data listener in a BlockChain object, forwards any received information from the P2PNode class
+ * to its block chain and automatically adds. 
+ *
  */
 public class Forward_Adder<T extends Serializable> implements Forwarder<T>, Serializable {
     
