@@ -11,10 +11,14 @@ import java.util.ArrayList;
 /**
  *
  * @author joseph
- * 
- * Listens for a node to send a string with their own ip address.
- *      adds the ip address to the connection list 
  * @param <T>
+ * 
+ * -- A lamda class
+ * 
+ * Used by pseudo-hosts only. Listens for a String (sent by the initialConnect method) and automatically
+ * adds the IP to the adresslist of the pseudo-host who will than ping the rest of the users on the network to
+ * add the connection. 
+ *
  */
     public class Forward_InitialConnect<T extends Serializable> implements Serializable, Forwarder<String> {
 
