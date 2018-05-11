@@ -10,9 +10,14 @@ import java.util.ArrayList;
 
 /**
  *
- * Listens for an arraylist of ip-addresses and adds all unknown ip address to the to connection list 
+ * @author joseph
+ * @param <T>
+ * 
+ * -- A lamda class
+ * 
+ *  Listens for arrayLists of IPaddresses to update the networks IP-address list
+ *  Automatically adds the adresses to the blockchain when data is received.
  */
-//Accepts an arraylist of ip addresses and adds them to their list 
 public class Forward_IP<T extends Serializable> implements Serializable, Forwarder<ArrayList<String>> {
 
     BlockChain<T> chain;
